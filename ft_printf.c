@@ -13,15 +13,26 @@
 #include "ft_printf.h"
 #include "libft/libft.h"
 
+void	ft_putnbr_base(unsigned long long n, int fd, int base)
+{
+	const char	*base_n = "0123456789abcdef";
+
+	if (n > 9)
+	{
+		ft_put
+	}
+	else (n <= 9 && n >= 0)
+}
+
 
 void	foo(char c, va_list ap)
 {
 	if (c == 'c')
 		return (ft_putchar_fd(va_arg(ap, int), 1));
 	else if (c == 's')
-	// 	return (ft_putstr_fd(va_arg(ap, char *)));
-	// else if (c == 'p')
-	// 	return (foo(va_arg(ap, int)));
+		return (ft_putstr_fd(va_arg(ap, char *), 1));
+	else if (c == 'p')
+		return (ft_putnbr_base(va_arg(ap, unsigned long long), 1, 16));
 	// else if (c == 'd')
 	// 	return (foo(va_arg(ap, int)));
 	// else if (c == 'i')
@@ -32,8 +43,8 @@ void	foo(char c, va_list ap)
 	// 	return (foo(va_arg(ap, int)));
 	// else if (c == 'X')
 	// 	return (foo(va_arg(ap, int)));
-	// else if (c == '%')
-	// 	return (ft_putchar_fd('%', 1));
+	else if (c == '%')
+		return (ft_putchar_fd('%', 1));
 	// else
 	// {
 
