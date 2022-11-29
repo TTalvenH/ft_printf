@@ -13,49 +13,64 @@
 #include "ft_printf.h"
 #include "libft/libft.h"
 
-void	ft_putnbr_base(unsigned long long n, int fd, int base)
+int	ft_putnbr_ull_base(unsigned long long n, int fd, int base, int flag)
 {
-	const char	*base_n = "0123456789abcdef";
+	const char	*base_n = "0123456789abcdef0123456789ABCDEF";
+	int			count;
 
-	if (n > 9)
+	count = 0;
+	if (!flag)
 	{
-		ft_put
+		count += ft_putstr_fd("0x", 1);
+		flag++;
 	}
-	else (n <= 9 && n >= 0)
+	if (base < 2 || base > 16)
+		return (-1);
+	if (n / base)
+	{
+		count += ft_putnbr_ull_base(n / base, fd, base, flag);
+		count += ft_putnbr_ull_base(n % base, fd, base, flag);
+	}
+	if (n < (unsigned long long)base)
+	{
+		if (flag == 1)
+			count += ft_putchar_fd (base_n[n], fd);
+		if (flag == 2)
+			count += ft_putchar_fd (base_n[n + 16], fd);
+	}
+	return (count);
 }
 
-
-void	foo(char c, va_list ap)
+int	check(char c, va_list ap)
 {
+	int	chr_n;
+
+	chr_n = 0;
 	if (c == 'c')
-		return (ft_putchar_fd(va_arg(ap, int), 1));
-	else if (c == 's')
-		return (ft_putstr_fd(va_arg(ap, char *), 1));
-	else if (c == 'p')
-		return (ft_putnbr_base(va_arg(ap, unsigned long long), 1, 16));
-	// else if (c == 'd')
-	// 	return (foo(va_arg(ap, int)));
-	// else if (c == 'i')
-	// 	return (foo(va_arg(ap, int)));
-	// else if (c == 'u')
-	// 	return (foo(va_arg(ap, int)));
-	// else if (c == 'x')
-	// 	return (foo(va_arg(ap, int)));
-	// else if (c == 'X')
-	// 	return (foo(va_arg(ap, int)));
-	else if (c == '%')
-		return (ft_putchar_fd('%', 1));
-	// else
-	// {
-
-	// }
-	return ;
+		chr_n = ft_putchar_fd(va_arg(ap, int), 1);
+	if (c == 's')
+		chr_n = ft_putstr_fd(va_arg(ap, char *), 1);
+	if (c == 'p')
+		chr_n = ft_putnbr_ull_base(va_arg(ap, unsigned long long), 1, 16, 0);
+	if (c == 'd' || c == 'i')
+		chr_n = ft_putnbr_fd(va_arg(ap, int), 1);
+	if (c == 'u')
+		chr_n = ft_putnbr_ull_base(va_arg(ap, unsigned), 1, 10, 1);
+	if (c == 'x')
+		chr_n = ft_putnbr_ull_base(va_arg(ap, unsigned), 1, 16, 1);
+	if (c == 'X')
+		chr_n = ft_putnbr_ull_base(va_arg(ap, unsigned), 1, 16, 2);
+	if (c == '%')
+		chr_n = ft_putchar_fd('%', 1);
+	return (chr_n);
 }
 
-int ft_printf(const char *str, ...)
+int	ft_printf(const char *str, ...)
 {
-	va_list ap;
+	va_list	ap;
+	int		chr_n;
 
+	chr_n = 0;
 	if (!str)
 		return (1);
 	va_start (ap, str);
@@ -64,14 +79,15 @@ int ft_printf(const char *str, ...)
 		if (*str == '%')
 		{
 			str++;
-			foo(*str, ap);
+			chr_n += check(*str, ap);
 		}
 		else
 		{
 			ft_putchar_fd(*str, 1);
+			chr_n++;
 		}
 		str++;
 	}
 	va_end(ap);
-	return (0);
+	return (chr_n);
 }
